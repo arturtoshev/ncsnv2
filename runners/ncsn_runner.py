@@ -194,7 +194,8 @@ class NCSNRunner():
                                                                self.config.sampling.n_steps_each,
                                                                self.config.sampling.step_lr,
                                                                final_only=True, verbose=True,
-                                                               denoise=self.config.sampling.denoise)
+                                                               denoise=self.config.sampling.denoise,
+                                                               levy_args=self.config.levy_args)
 
                         sample = all_samples[-1].view(all_samples[-1].shape[0], self.config.data.channels,
                                                       self.config.data.image_size,
@@ -252,7 +253,8 @@ class NCSNRunner():
                                                                   sigmas,
                                                                   self.config.data.image_size,
                                                                   self.config.sampling.n_steps_each,
-                                                                  self.config.sampling.step_lr)
+                                                                  self.config.sampling.step_lr,
+                                                                  levy_args=self.config.levy_args)
 
                 torch.save(refer_images[:width, ...], os.path.join(self.args.image_folder, 'refer_image.pth'))
                 refer_images = refer_images[:width, None, ...].expand(-1, width, -1, -1, -1).reshape(-1,
@@ -302,7 +304,8 @@ class NCSNRunner():
                                                                      self.config.sampling.n_interpolations,
                                                                      self.config.sampling.n_steps_each,
                                                                      self.config.sampling.step_lr, verbose=True,
-                                                                     final_only=self.config.sampling.final_only)
+                                                                     final_only=self.config.sampling.final_only,
+                                                                     levy_args=self.config.levy_args)
 
                 if not self.config.sampling.final_only:
                     for i, sample in tqdm.tqdm(enumerate(all_samples), total=len(all_samples),
@@ -347,7 +350,8 @@ class NCSNRunner():
                                                        self.config.sampling.n_steps_each,
                                                        self.config.sampling.step_lr, verbose=True,
                                                        final_only=self.config.sampling.final_only,
-                                                       denoise=self.config.sampling.denoise)
+                                                       denoise=self.config.sampling.denoise,
+                                                       levy_args=self.config.levy_args)
 
                 if not self.config.sampling.final_only:
                     for i, sample in tqdm.tqdm(enumerate(all_samples), total=len(all_samples),
@@ -402,7 +406,8 @@ class NCSNRunner():
                 all_samples = anneal_Langevin_dynamics(samples, score, sigmas,
                                                        self.config.sampling.n_steps_each,
                                                        self.config.sampling.step_lr, verbose=False,
-                                                       denoise=self.config.sampling.denoise)
+                                                       denoise=self.config.sampling.denoise,
+                                                       levy_args=self.config.levy_args)
 
                 samples = all_samples[-1]
                 for img in samples:
@@ -509,7 +514,8 @@ class NCSNRunner():
                                                        self.config.fast_fid.n_steps_each,
                                                        self.config.fast_fid.step_lr,
                                                        verbose=self.config.fast_fid.verbose,
-                                                       denoise=self.config.sampling.denoise)
+                                                       denoise=self.config.sampling.denoise,
+                                                       levy_args=self.config.levy_args)
 
                 final_samples = all_samples[-1]
                 for id, sample in enumerate(final_samples):
@@ -569,7 +575,8 @@ class NCSNRunner():
                                                        self.config.fast_fid.n_steps_each,
                                                        self.config.fast_fid.step_lr,
                                                        verbose=self.config.fast_fid.verbose,
-                                                       denoise=self.config.sampling.denoise)
+                                                       denoise=self.config.sampling.denoise,
+                                                       levy_args=self.config.levy_args)
 
                 final_samples = all_samples[-1]
                 for id, sample in enumerate(final_samples):
@@ -588,3 +595,5 @@ class NCSNRunner():
 
         with open(os.path.join(self.args.image_folder, 'fids.pickle'), 'wb') as handle:
             pickle.dump(fids, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            
+
